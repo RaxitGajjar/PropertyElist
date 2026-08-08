@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export default function BuyListPage() {
+export const dynamic = 'force-dynamic';
+
+function BuyListContent() {
   const searchParams = useSearchParams();
   const initialCity = searchParams.get("city") || "Ahmedabad";
   const initialQuery = searchParams.get("query") || "";
@@ -160,7 +162,7 @@ export default function BuyListPage() {
       {/* Main Container */}
       <main className="py-12 px-8 max-w-5xl mx-auto space-y-16">
         
-        {/* 1. FEATURED PROPERTIES SECTION (HORIZONTAL LINE VIEW) */}
+        {/* 1. FEATURED PROPERTIES SECTION */}
         <div>
           <div className="border-b border-slate-100 pb-4 mb-6">
             <span className="text-emerald-600 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">
@@ -180,7 +182,6 @@ export default function BuyListPage() {
               {featuredListings.map((item) => (
                 <div key={item.id} className="border border-slate-200 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col md:flex-row items-center justify-between gap-6">
                   
-                  {/* Left: Thumbnail & Main Info */}
                   <div className="flex items-center gap-4 w-full md:w-auto">
                     <div className="w-24 h-20 bg-slate-100 rounded-lg overflow-hidden shrink-0 relative">
                       <div 
@@ -199,7 +200,6 @@ export default function BuyListPage() {
                     </div>
                   </div>
 
-                  {/* Middle: Listed By & Price */}
                   <div className="flex flex-col md:items-end w-full md:w-auto text-left md:text-right border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
                     <span className="text-emerald-600 font-black text-base">{item.price || "Contact for Price"}</span>
                     {item.developer && (
@@ -209,7 +209,6 @@ export default function BuyListPage() {
                     )}
                   </div>
 
-                  {/* Right: Action Button */}
                   <div className="w-full md:w-auto">
                     <Link href={`/projects/${item.slug || 'detail'}`} className="block w-full md:w-auto text-center border border-slate-900 px-6 py-2.5 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
                       View Details
@@ -222,7 +221,7 @@ export default function BuyListPage() {
           )}
         </div>
 
-        {/* 2. FREE & OTHER SEARCHED PROPERTIES SECTION (HORIZONTAL LINE VIEW) */}
+        {/* 2. FREE & OTHER PROPERTIES SECTION */}
         <div>
           <div className="border-b border-slate-100 pb-4 mb-6">
             <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">
@@ -240,7 +239,6 @@ export default function BuyListPage() {
               {freeAndOtherListings.map((item) => (
                 <div key={item.id} className="border border-slate-200 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col md:flex-row items-center justify-between gap-6">
                   
-                  {/* Left: Thumbnail & Main Info */}
                   <div className="flex items-center gap-4 w-full md:w-auto">
                     <div className="w-24 h-20 bg-slate-100 rounded-lg overflow-hidden shrink-0 relative">
                       <div 
@@ -256,7 +254,6 @@ export default function BuyListPage() {
                     </div>
                   </div>
 
-                  {/* Middle: Listed By & Price */}
                   <div className="flex flex-col md:items-end w-full md:w-auto text-left md:text-right border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
                     <span className="text-slate-900 font-black text-base">{item.price || "Contact for Price"}</span>
                     {item.developer && (
@@ -266,7 +263,6 @@ export default function BuyListPage() {
                     )}
                   </div>
 
-                  {/* Right: Action Button */}
                   <div className="w-full md:w-auto">
                     <Link href={`/projects/${item.slug || 'detail'}`} className="block w-full md:w-auto text-center border border-slate-900 px-6 py-2.5 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
                       View Details
@@ -299,4 +295,10 @@ export default function BuyListPage() {
   );
 }
 
-export const dynamic = 'force-dynamic';
+export default function BuyListPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-xs font-bold uppercase tracking-widest text-slate-500">Loading...</div>}>
+      <BuyListContent />
+    </Suspense>
+  );
+}
