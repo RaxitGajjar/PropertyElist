@@ -1,23 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export default function UserPrivateProfilePage() {
+export const dynamic = "force-dynamic";
+
+interface Property {
+  id: number;
+  title: string;
+  location: string;
+  price: string;
+  status: string;
+  leadsCount: number;
+  views: number;
+}
+
+function ProfileContent() {
   const searchParams = useSearchParams();
-  const tabFromUrl = searchParams.get("tab");
+  const tabFromUrl = searchParams?.get("tab");
 
-  const [activeTab, setActiveTab] = useState("activity");
+  // સીધું ઇનિશિયલ સ્ટેટમાં જ URL ની વેલ્યુ સેટ કરી દીધી (useEffect ની જરૂર નથી)
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "activity");
 
-  useEffect(() => {
-    if (tabFromUrl) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [tabFromUrl]);
-
-  // Mock User Data & Profile State
-  const [user] = useState({
+  // Mock User Data
+  const user = {
     name: "Aniket Builder",
     email: "aniket@propertyelist.com",
     phone: "+91 98250 12345",
@@ -30,14 +37,14 @@ export default function UserPrivateProfilePage() {
       billNumber: "INV-2026-8849",
       amountPaid: "₹ 15,000"
     }
-  });
+  };
 
-  // User's Properties Listing (Active & Deactive)
-  const [properties, setProperties] = useState([
+  // User's Properties Listing
+  const [properties, setProperties] = useState<Property[]>([
     {
       id: 1,
       title: "Aniket Elite Luxury Apartment",
-      location: "Science City Circle, Ahmedabad", // Location is locked for editing
+      location: "Science City Circle, Ahmedabad",
       price: "₹ 1.25 Cr",
       status: "Active",
       leadsCount: 14,
@@ -46,7 +53,7 @@ export default function UserPrivateProfilePage() {
     {
       id: 2,
       title: "Science City Commercial Shop",
-      location: "Science City Circle, Ahmedabad", // Location is locked for editing
+      location: "Science City Circle, Ahmedabad",
       price: "₹ 75 Lakhs",
       status: "Deactive",
       leadsCount: 3,
@@ -55,7 +62,7 @@ export default function UserPrivateProfilePage() {
   ]);
 
   // Editing Property State
-  const [editingProperty, setEditingProperty] = useState<any>(null);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editPrice, setEditPrice] = useState("");
 
@@ -64,7 +71,7 @@ export default function UserPrivateProfilePage() {
   const [newPassword, setNewPassword] = useState("");
   const [passwordMsg, setPasswordMsg] = useState("");
 
-  const handleEditClick = (prop: any) => {
+  const handleEditClick = (prop: Property) => {
     setEditingProperty(prop);
     setEditTitle(prop.title);
     setEditPrice(prop.price);
@@ -72,14 +79,16 @@ export default function UserPrivateProfilePage() {
 
   const handleSaveProperty = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editingProperty) return;
+
     setProperties(properties.map(p => {
       if (p.id === editingProperty.id) {
-        return { ...p, title: editTitle, price: editPrice }; // Location is NOT modified
+        return { ...p, title: editTitle, price: editPrice };
       }
       return p;
     }));
     setEditingProperty(null);
-    alert("Property updated successfully! (Note: Location security rules maintained)");
+    alert("Property updated successfully!");
   };
 
   const handlePasswordChange = (e: React.FormEvent) => {
@@ -118,7 +127,7 @@ export default function UserPrivateProfilePage() {
       {/* Main Dashboard Container */}
       <main className="max-w-7xl mx-auto px-8 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
         
-        {/* Sidebar Navigation matching Dropdown exactly */}
+        {/* Sidebar Navigation */}
         <aside className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-fit space-y-2">
           <button
             onClick={() => setActiveTab("activity")}
@@ -157,7 +166,7 @@ export default function UserPrivateProfilePage() {
         {/* Content Area */}
         <div className="md:col-span-3 space-y-8">
           
-          {/* TAB 1: MY ACTIVITY & LEADS INQUIRIES */}
+          {/* TAB 1: MY ACTIVITY */}
           {activeTab === "activity" && (
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
               <div className="flex justify-between items-center border-b border-slate-100 pb-4">
@@ -188,7 +197,7 @@ export default function UserPrivateProfilePage() {
             </div>
           )}
 
-          {/* TAB 2: ACTIVE & DEACTIVE PROPERTIES */}
+          {/* TAB 2: PROPERTIES */}
           {activeTab === "listings" && (
             <div className="space-y-6">
               <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
@@ -230,7 +239,7 @@ export default function UserPrivateProfilePage() {
             </div>
           )}
 
-          {/* TAB 3: PACKAGE, EXPIRY & TAX INVOICE */}
+          {/* TAB 3: PACKAGE */}
           {activeTab === "package" && (
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
               <div>
@@ -279,7 +288,7 @@ export default function UserPrivateProfilePage() {
             </div>
           )}
 
-          {/* TAB 4: SECURITY & CHANGE PASSWORD */}
+          {/* TAB 4: SECURITY */}
           {activeTab === "settings" && (
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
               <div>
@@ -332,7 +341,7 @@ export default function UserPrivateProfilePage() {
 
       </main>
 
-      {/* EDIT PROPERTY MODAL WITH LOCATION LOCKED RESTRICTION */}
+      {/* EDIT MODAL */}
       {editingProperty && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex justify-center items-center px-4">
           <div className="bg-white border border-slate-200 p-8 max-w-md w-full rounded-2xl shadow-2xl text-slate-900 relative">
@@ -371,7 +380,6 @@ export default function UserPrivateProfilePage() {
                   value={editingProperty.location}
                   className="w-full bg-slate-200 border border-slate-300 rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-500 cursor-not-allowed"
                 />
-                <span className="text-[10px] text-rose-600 font-bold mt-1 block">You cannot alter the location during editing.</span>
               </div>
 
               <div>
@@ -397,5 +405,13 @@ export default function UserPrivateProfilePage() {
       )}
 
     </div>
+  );
+}
+
+export default function UserPrivateProfilePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold text-slate-500 uppercase tracking-widest text-xs">Loading Profile...</div>}>
+      <ProfileContent />
+    </Suspense>
   );
 }
