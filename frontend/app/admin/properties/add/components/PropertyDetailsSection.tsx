@@ -1,81 +1,55 @@
 "use client";
 
+import React from "react";
+import { PropertyFormData, SectionProps } from "../types";
 import ResidentialSection from "./ResidentialSection";
 import CommercialSection from "./CommercialSection";
 import IndustrialSection from "./IndustrialSection";
 
-interface PropertyDetailsSectionProps {
-  formData: {
-    propertyType: string;
-  };
-  setFormData: React.Dispatch<
-    React.SetStateAction<{
-      propertyType: string;
-      projectName: string;
-      developerName: string;
-      propertyTitle: string;
-      city: string;
-      location: string;
-      fullAddress: string;
-      googleMapLink: string;
-      propertyPrice: string;
-      priceType: string;
-      bookingAmount: string;
-      maintenanceCharges: string;
-      pricePerSqft: string;
-      priceOnRequest: boolean;
-    }>
-  >;
-}
-
 export default function PropertyDetailsSection({
   formData,
   setFormData,
-}: PropertyDetailsSectionProps) {
-  return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+}: SectionProps) {
+  const currentPropertyType = formData.propertyType || "Apartment";
 
-      <h2 className="text-2xl font-bold border-b pb-4 mb-8">
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8 font-sans">
+      <h2 className="text-2xl font-bold border-b border-slate-100 pb-4 mb-8 text-slate-900">
         🏠 Property Details
       </h2>
 
-      {/* Property Type */}
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-
         <div>
-          <label className="block text-sm font-semibold mb-2">
+          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
             Property Type *
           </label>
 
           <select
-            value={formData.propertyType}
+            value={currentPropertyType}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData((prev: PropertyFormData) => ({
                 ...prev,
                 propertyType: e.target.value,
               }))
             }
-            className="w-full border rounded-xl p-4"
+            className="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 text-sm font-semibold text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500 transition cursor-pointer"
           >
-            <option>Apartment</option>
-            <option>Penthouse</option>
-            <option>Villa</option>
-            <option>Bungalow</option>
-            <option>Row House</option>
-            <option>Plot</option>
-            <option>Shop</option>
-            <option>Showroom</option>
-            <option>Commercial Office</option>
-            <option>Warehouse</option>
-            <option>Industrial Shed</option>
+            <option value="Apartment">Apartment</option>
+            <option value="Penthouse">Penthouse</option>
+            <option value="Villa">Villa</option>
+            <option value="Bungalow">Bungalow</option>
+            <option value="Row House">Row House</option>
+            <option value="Plot">Plot</option>
+            <option value="Shop">Shop</option>
+            <option value="Showroom">Showroom</option>
+            <option value="Commercial Office">Commercial Office</option>
+            <option value="Warehouse">Warehouse</option>
+            <option value="Industrial Shed">Industrial Shed</option>
           </select>
         </div>
-
       </div>
 
       {/* Residential */}
-
       {[
         "Apartment",
         "Penthouse",
@@ -83,29 +57,38 @@ export default function PropertyDetailsSection({
         "Bungalow",
         "Row House",
         "Plot",
-      ].includes(formData.propertyType) && (
-        <ResidentialSection propertyType={formData.propertyType} />
+      ].includes(currentPropertyType) && (
+        <ResidentialSection
+          propertyType={currentPropertyType}
+          formData={formData}
+          setFormData={setFormData}
+        />
       )}
 
       {/* Commercial */}
-
       {[
         "Shop",
         "Showroom",
         "Commercial Office",
-      ].includes(formData.propertyType) && (
-        <CommercialSection propertyType={formData.propertyType} />
+      ].includes(currentPropertyType) && (
+        <CommercialSection
+          propertyType={currentPropertyType}
+          formData={formData}
+          setFormData={setFormData}
+        />
       )}
 
       {/* Industrial */}
-
       {[
         "Warehouse",
         "Industrial Shed",
-      ].includes(formData.propertyType) && (
-        <IndustrialSection propertyType={formData.propertyType} />
+      ].includes(currentPropertyType) && (
+        <IndustrialSection
+          propertyType={currentPropertyType}
+          formData={formData}
+          setFormData={setFormData}
+        />
       )}
-
     </div>
   );
 }

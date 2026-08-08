@@ -1,28 +1,11 @@
 "use client";
 
+import { PropertyFormData } from "../types";
+
 interface ProjectSectionProps {
-  formData: {
-    projectName: string;
-    developerName: string;
-    propertyTitle: string;
-  };
+  formData: PropertyFormData;
   setFormData: React.Dispatch<
-    React.SetStateAction<{
-      propertyType: string;
-      projectName: string;
-      developerName: string;
-      propertyTitle: string;
-      city: string;
-      location: string;
-      fullAddress: string;
-      googleMapLink: string;
-      propertyPrice: string;
-      priceType: string;
-      bookingAmount: string;
-      maintenanceCharges: string;
-      pricePerSqft: string;
-      priceOnRequest: boolean;
-    }>
+    React.SetStateAction<PropertyFormData>
   >;
 }
 
@@ -31,16 +14,16 @@ export default function ProjectSection({
   setFormData,
 }: ProjectSectionProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-      <h2 className="text-2xl font-bold mb-8 border-b pb-4">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8 font-sans">
+
+      <h2 className="text-2xl font-bold mb-8 border-b border-slate-100 pb-4 text-slate-900">
         🏢 Project Information
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {/* Project Name */}
         <div>
-          <label className="block text-sm font-semibold mb-2">
+          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
             Project Name *
           </label>
 
@@ -54,13 +37,12 @@ export default function ProjectSection({
               }))
             }
             placeholder="Ex. Aniket Elite"
-            className="w-full border rounded-xl p-4 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500 transition"
           />
         </div>
 
-        {/* Developer Name */}
         <div>
-          <label className="block text-sm font-semibold mb-2">
+          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
             Developer Name
           </label>
 
@@ -74,13 +56,12 @@ export default function ProjectSection({
               }))
             }
             placeholder="Ex. Aniket Developers"
-            className="w-full border rounded-xl p-4 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500 transition"
           />
         </div>
 
-        {/* Property Title */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-semibold mb-2">
+          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
             Property Title *
           </label>
 
@@ -94,11 +75,12 @@ export default function ProjectSection({
               }))
             }
             placeholder="Ex. Premium 2 BHK Apartments Near Science City"
-            className="w-full border rounded-xl p-4 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-slate-200 bg-slate-50 rounded-xl p-3.5 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500 transition"
           />
         </div>
 
       </div>
+
     </div>
   );
 }
