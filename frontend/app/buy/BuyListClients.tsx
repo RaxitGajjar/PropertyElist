@@ -119,7 +119,6 @@ export default function BuyListClients() {
           <Link href="/" className="flex items-center">
             <img src="/logo.png" alt="PropertyELIST" className="h-36 w-auto object-contain" />
           </Link>
-
           <nav className="hidden md:flex items-center gap-10 font-bold text-xs uppercase tracking-widest text-slate-700">
             <Link href="/" className="hover:text-emerald-600 transition">Home</Link>
             <Link href="/buy" className="text-emerald-600">Listings</Link>
@@ -127,7 +126,6 @@ export default function BuyListClients() {
             <Link href="/buy" className="hover:text-emerald-600 transition">About</Link>
             <Link href="/buy" className="hover:text-emerald-600 transition">Contact</Link>
           </nav>
-
           <div className="flex items-center gap-4">
             <Link href="/" className="text-slate-800 hover:text-emerald-600 font-bold text-xs uppercase tracking-widest px-3 py-2.5 transition">
               ← Back to Home
