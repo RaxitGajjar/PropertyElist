@@ -4,13 +4,13 @@ import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 function BuyListContent() {
   const searchParams = useSearchParams();
-  const initialCity = searchParams.get("city") || "Ahmedabad";
-  const initialQuery = searchParams.get("query") || "";
-  const initialType = searchParams.get("type") || "";
+  const initialCity = searchParams?.get("city") || "Ahmedabad";
+  const initialQuery = searchParams?.get("query") || "";
+  const initialType = searchParams?.get("type") || "";
 
   const [selectedCity, setSelectedCity] = useState(initialCity);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
@@ -19,7 +19,6 @@ function BuyListContent() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Sample data with Title, Price, Location & Category
   const fallbackListings = [
     {
       id: 1,
@@ -63,26 +62,30 @@ function BuyListContent() {
   ];
 
   useEffect(() => {
+    let isMounted = true;
     const fetchListings = async () => {
       setLoading(true);
       try {
         const response = await fetch(`/api/projects?city=${encodeURIComponent(selectedCity)}`);
+        if (!response.ok) throw new Error("Fetch failed");
         const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setProjects(data);
-        } else {
-          setProjects(fallbackListings);
+        if (isMounted) {
+          if (Array.isArray(data) && data.length > 0) {
+            setProjects(data);
+          } else {
+            setProjects(fallbackListings);
+          }
         }
       } catch (err) {
-        setProjects(fallbackListings);
+        if (isMounted) setProjects(fallbackListings);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     fetchListings();
+    return () => { isMounted = false; };
   }, [selectedCity]);
 
-  // Filtering based on search query and type
   const filteredListings = projects.filter((item) => {
     const matchesCity = item.city?.toLowerCase() === selectedCity.toLowerCase();
     const matchesQuery = searchQuery
@@ -95,14 +98,11 @@ function BuyListContent() {
     return matchesCity && matchesQuery && matchesType;
   });
 
-  // Separate Featured and Free/Other Listings
   const featuredListings = filteredListings.filter(p => p.isFeatured || p.developer?.includes("Builder"));
   const freeAndOtherListings = filteredListings.filter(p => !p.isFeatured && !p.developer?.includes("Builder"));
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 relative">
-      
-      {/* Header */}
       <header className="border-b border-slate-100 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-8 h-24 flex justify-between items-center">
           <Link href="/" className="flex items-center">
@@ -129,7 +129,6 @@ function BuyListContent() {
         </div>
       </header>
 
-      {/* Search Filter Bar */}
       <section className="bg-slate-50 border-b border-slate-200 py-6 px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="w-full md:w-auto flex gap-4">
@@ -159,10 +158,7 @@ function BuyListContent() {
         </div>
       </section>
 
-      {/* Main Container */}
       <main className="py-12 px-8 max-w-5xl mx-auto space-y-16">
-        
-        {/* 1. FEATURED PROPERTIES SECTION */}
         <div>
           <div className="border-b border-slate-100 pb-4 mb-6">
             <span className="text-emerald-600 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">
@@ -181,7 +177,6 @@ function BuyListContent() {
             <div className="space-y-4">
               {featuredListings.map((item) => (
                 <div key={item.id} className="border border-slate-200 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col md:flex-row items-center justify-between gap-6">
-                  
                   <div className="flex items-center gap-4 w-full md:w-auto">
                     <div className="w-24 h-20 bg-slate-100 rounded-lg overflow-hidden shrink-0 relative">
                       <div 
@@ -214,14 +209,12 @@ function BuyListContent() {
                       View Details
                     </Link>
                   </div>
-
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* 2. FREE & OTHER PROPERTIES SECTION */}
         <div>
           <div className="border-b border-slate-100 pb-4 mb-6">
             <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">
@@ -238,7 +231,6 @@ function BuyListContent() {
             <div className="space-y-4">
               {freeAndOtherListings.map((item) => (
                 <div key={item.id} className="border border-slate-200 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col md:flex-row items-center justify-between gap-6">
-                  
                   <div className="flex items-center gap-4 w-full md:w-auto">
                     <div className="w-24 h-20 bg-slate-100 rounded-lg overflow-hidden shrink-0 relative">
                       <div 
@@ -268,16 +260,13 @@ function BuyListContent() {
                       View Details
                     </Link>
                   </div>
-
                 </div>
               ))}
             </div>
           )}
         </div>
-
       </main>
 
-      {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-12 px-8 text-xs text-slate-500 mt-16">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex gap-8 uppercase font-bold tracking-widest text-slate-900">
