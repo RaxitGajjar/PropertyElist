@@ -1,15 +1,17 @@
-import dynamic from 'next/dynamic';
+import dynamicImport from "next/dynamic";
 
-// બિલ્ડ વખતે સર્વર સાઇડ રેન્ડરિંગ (SSR) સંપૂર્ણપણે બંધ કરવા માટેનો જાદુઈ કોડ
-const BuyListClients = dynamic(() => import('./BuyListClients'), {
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
+const BuyListClient = dynamicImport(() => import("./BuyListClients"), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen flex items-center justify-center font-bold text-slate-500 uppercase tracking-widest text-xs">
       Loading Listings...
     </div>
-  )
+  ),
 });
 
 export default function BuyPage() {
-  return <BuyListClients />;
+  return <BuyListClient />;
 }
