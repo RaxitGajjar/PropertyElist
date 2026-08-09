@@ -53,20 +53,22 @@ export default function UserSignUpPage() {
       return;
     }
 
-    localStorage.setItem("property_is_logged_in", "true");
-    localStorage.setItem("property_user_data", JSON.stringify({
+    // 💡 sessionStorage સેટ કર્યું છે જેથી ટેબ ક્લોઝ થતાં ઓટોમેટિક લોગઆઉટ થઈ જાય
+    sessionStorage.setItem("property_is_logged_in", "true");
+    sessionStorage.setItem("user", JSON.stringify({
       name: name,
       email: email || `${mobile}@propertyelist.com`,
+      role: userRole,
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
     }));
 
     alert(`Account created successfully as ${userRole}! Redirecting to Home...`);
     router.push("/");
+    router.refresh();
   };
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 relative flex flex-col justify-between transition-opacity duration-500 opacity-100">
-      
       <style jsx global>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px) scale(0.98); }
@@ -77,7 +79,7 @@ export default function UserSignUpPage() {
         }
       `}</style>
 
-      {/* Header with Logo */}
+      {/* Header */}
       <header className="border-b border-slate-100 bg-white/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-8 h-24 flex justify-between items-center">
           <Link href="/" className="flex items-center">
@@ -125,7 +127,7 @@ export default function UserSignUpPage() {
               />
             </div>
 
-            {/* User Role Selection */}
+            {/* Role Selection */}
             <div>
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                 I am a *

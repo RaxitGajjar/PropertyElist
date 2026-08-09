@@ -18,15 +18,18 @@ export default function UserLoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("property_is_logged_in", "true");
-    localStorage.setItem("property_user_data", JSON.stringify({
-      name: identifier.split("@")[0] || "Aniket Builder",
-      email: identifier || "aniket@propertyelist.com",
+    
+    // 💡 sessionStorage સેટ કર્યું છે જેથી ટેબ ક્લોઝ થતાં ઓટોમેટિક લોગઆઉટ થઈ જાય
+    sessionStorage.setItem("property_is_logged_in", "true");
+    sessionStorage.setItem("user", JSON.stringify({
+      name: identifier.split("@")[0] || "User",
+      email: identifier || "user@propertyelist.com",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
     }));
 
     alert("Login successful!");
     router.push("/");
+    router.refresh();
   };
 
   const handleSendResetOtp = (e: React.FormEvent) => {
@@ -61,7 +64,6 @@ export default function UserLoginPage() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 relative flex flex-col justify-between transition-opacity duration-500 opacity-100">
-      
       <style jsx global>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px) scale(0.98); }
@@ -72,7 +74,7 @@ export default function UserLoginPage() {
         }
       `}</style>
 
-      {/* Header with Logo */}
+      {/* Header */}
       <header className="border-b border-slate-100 bg-white/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-8 h-24 flex justify-between items-center">
           <Link href="/" className="flex items-center">
@@ -89,7 +91,7 @@ export default function UserLoginPage() {
         </div>
       </header>
 
-      {/* Main Container */}
+      {/* Main Login */}
       <main className="flex-grow flex items-center justify-center px-6 py-12">
         <div className="max-w-md w-full bg-white border border-slate-200 p-8 md:p-10 rounded-2xl shadow-xl custom-animate">
           <div className="text-center mb-8">
