@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 const VERIFY_TOKEN = "propertyelist_secret";
 
-// 1️⃣ GET: Facebook Verification
+// 1️⃣ GET Method: Facebook Verification
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const mode = searchParams.get("hub.mode");
@@ -16,10 +16,11 @@ export async function GET(request: Request) {
   return NextResponse.json({ status: "Active", message: "Webhook is live" });
 }
 
-// 2️⃣ POST: Real-Time Lead Ingestion
+// 2️⃣ POST Method: Facebook માંથી લીડ આવતા જ Admin Inquiry માં સેવ કરશે
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("🟢 Facebook Webhook Payload:", JSON.stringify(body, null, 2));
 
     if (body.entry && body.entry.length > 0) {
       for (const entry of body.entry) {
@@ -28,35 +29,37 @@ export async function POST(request: Request) {
             const leadgenId = change.value?.leadgen_id;
 
             if (leadgenId) {
-              // 📥 ટેસ્ટ/રિયલ લીડ ઓબ્જેક્ટ
-              const leadEntry = {
-                id: `FB-${leadgenId}`,
-                customerName: `Meta Test Lead (${leadgenId.slice(-4)})`,
+              // Admin Panel ના Format મુજબ ડાયરેક્ટ ડેટા ઓબ્જેક્ટ
+              const leadData = {
+                name: `Meta Ad Lead (${leadgenId.slice(-4)})`,
                 phone: "+91 9876543210",
-                email: "testlead@propertyelist.com",
-                propertyName: "Facebook Lead Ad Campaign",
+                email: "lead@propertyelist.com",
+                property_name: "Facebook Lead Ad Campaign",
                 source: "Facebook Ads",
-                date: new Date().toLocaleString(),
+                message: `Lead Generated via Facebook Test Tool (ID: ${leadgenId})`,
                 status: "New",
+                created_at: new Date().toISOString(),
               };
 
-              console.log("💾 Incoming Lead Detected:", leadEntry);
+              // Admin Inquiries API પર ડેટા પોસ્ટ કરો
+              const host = request.headers.get("host");
+              const protocol = host?.includes("localhost") ? "http" : "https";
+              const apiUrl = `${protocol}://${host}/api/admin/inquiries`;
 
-              // Backend / Admin API Endpoint Call
-              const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://propertyelist.com";
-              await fetch(`${baseUrl}/api/admin/inquiries`, {
+              await fetch(apiUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(leadEntry),
-              }).catch((e) => console.log("Internal Post Warning:", e));
+                body: JSON.stringify(leadData),
+              }).catch((err) => console.log("Admin Sync Error:", err));
             }
           }
         }
       }
     }
 
-    return NextResponse.json({ success: true, message: "Lead Processed" }, { status: 200 });
+    return NextResponse.json({ success: true, message: "Lead captured successfully!" }, { status: 200 });
   } catch (error) {
+    console.error("❌ Error:", error);
     return NextResponse.json({ success: false, error }, { status: 500 });
   }
 }
