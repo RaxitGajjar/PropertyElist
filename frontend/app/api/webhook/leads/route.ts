@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 // 🔐 ફેસબુક માટેનો Verify Token (આ શબ્દ જ Facebook માં નાખવો)
-const VERIFY_TOKEN = "propertyelist_secret";
+const VERIFY_TOKEN = "propertyelist_raxit";
 
 // 1️⃣ GET Method: Facebook Webhook Verification માટે
 export async function GET(request: Request) {
