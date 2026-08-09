@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function InquiriesPage() {
   const [inquiries, setInquiries] = useState([
@@ -22,7 +22,47 @@ export default function InquiriesPage() {
     { propertyName: "Property Z (Commercial Hub)", area: "SG Highway, Ahmedabad", owner: "Apex Realities", type: "Free Customer" },
   ];
 
-  // 🚀 Simulate Incoming Ad Lead (લોકલહોસ્ટ પર ફેસબુક/ઇન્સ્ટાગ્રામ લીડ ટેસ્ટ કરવા માટે)
+  // 🔄 API માંથી Real-Time Webhook Leads ખેંચવા માટે (Auto-Polling Every 4 Sec)
+  const fetchLiveLeads = async () => {
+    try {
+      const res = await fetch("/api/admin/inquiries");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          // નવા Webhook data ને હાલના Inquiries સ્ટેટ સાથે મર્જ કરો
+          setInquiries((prevInquiries) => {
+            const existingIds = new Set(prevInquiries.map((item) => item.id));
+            const newItems = data.filter((item: any) => !existingIds.has(item.id));
+            
+            if (newItems.length > 0) {
+              const formattedNewItems = newItems.map((item: any) => ({
+                id: item.id || `LEAD-${Date.now()}`,
+                customerName: item.clientName || item.customerName || "Meta Ad Lead",
+                phone: item.phone || "+91 9876543210",
+                targetProperty: item.targetProperty || "Property X (Aniket Elite)",
+                bhk: item.requirement || "4 BHK",
+                area: item.location || "Science City, Ahmedabad",
+                source: item.source || "👥 Facebook Sponsored Ad",
+                assignedUsers: item.assignedUsers || [],
+              }));
+              return [...formattedNewItems, ...prevInquiries];
+            }
+            return prevInquiries;
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching live leads:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveLeads();
+    const interval = setInterval(fetchLiveLeads, 4000); // 4 સેકન્ડે ઓટો-રિફ્રેશ થશે
+    return () => clearInterval(interval);
+  }, []);
+
+  // 🚀 Simulate Incoming Ad Lead (લોકલહોસ્ટ પર ટેસ્ટ કરવા માટે)
   const handleSimulateAdLead = () => {
     const newAdLead = {
       id: `LEAD-${Date.now()}`,
@@ -81,7 +121,7 @@ export default function InquiriesPage() {
           <p className="text-slate-500 mt-1">ફેસબુક અને ઇન્સ્ટાગ્રામ એડ્સમાંથી આવતી લીડ્સનું રિયલ-ટાઇમ મેનેજમેન્ટ</p>
         </div>
 
-        {/* 🧪 Test Lead Button for Localhost */}
+        {/* 🧪 Test Lead Button */}
         <button
           onClick={handleSimulateAdLead}
           className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-md transition cursor-pointer flex items-center gap-2"
@@ -97,7 +137,7 @@ export default function InquiriesPage() {
             Active Incoming Leads ({inquiries.length})
           </h3>
           <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
-            🟢 Localhost & Webhook Listener Active
+            🟢 Real-Time Webhook Listener Active
           </span>
         </div>
 
