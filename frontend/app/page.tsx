@@ -31,12 +31,14 @@ export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   
+  // Profile & Notification Dropdown States
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const notifDropdownRef = useRef<HTMLDivElement>(null);
 
+  // Authentication State (sessionStorage)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({
     name: "Aniket Builder",
@@ -53,7 +55,7 @@ export default function HomePage() {
         try {
           setUserData(JSON.parse(savedUser));
         } catch {
-          // ignore parse error
+          // ignore error
         }
       }
     } else {
@@ -261,7 +263,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 relative">
-      
       <style jsx global>{`
         @keyframes pageFadeIn {
           from { opacity: 0; transform: translateY(6px); }
@@ -305,7 +306,7 @@ export default function HomePage() {
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
                 
-                {/* NOTIFICATIONS BELL DROPDOWN */}
+                {/* 🔔 NOTIFICATIONS BELL DROPDOWN */}
                 <div className="relative" ref={notifDropdownRef}>
                   <button 
                     onClick={() => {
@@ -354,7 +355,7 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {/* PROFILE DROPDOWN */}
+                {/* 👤 PROFILE AVATAR DROPDOWN */}
                 <div className="relative" ref={profileDropdownRef}>
                   <button 
                     onClick={() => {
@@ -416,6 +417,7 @@ export default function HomePage() {
               </>
             )}
 
+            {/* Post Property Button */}
             <button 
               onClick={handlePostPropertyClick}
               className="relative bg-[#10b981] hover:bg-[#059669] text-white font-bold text-xs uppercase tracking-widest px-5 py-3 transition shadow-md inline-flex items-center ml-2 cursor-pointer"
