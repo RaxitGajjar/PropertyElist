@@ -25,7 +25,7 @@ export default function AdminLogin() {
       router.push("/admin/dashboard");
       router.refresh();
     } else {
-      setError("ખોટો યુઝરનેમ અથવા પાસવર્ડ છે!");
+      setError("wrong username & password");
     }
   };
 
