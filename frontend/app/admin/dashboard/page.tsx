@@ -3,16 +3,19 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [activePropertiesCount, setActivePropertiesCount] = useState<number>(0);
+  const [loadingStats, setLoadingStats] = useState<boolean>(true);
 
   useEffect(() => {
     const getCookie = (name: string) => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      if (parts.length === 2) return parts.pop()?.split(";").shift();
     };
 
     const cookieVal = getCookie("isAdminLoggedIn");
@@ -21,12 +24,29 @@ export default function DashboardPage() {
     if (cookieVal !== "true" && localVal !== "true") {
       router.push("/admin/login");
     } else {
-      // Async ટાઇમઆઉટ દ્વારા સેટસ્ટેટ કરવાથી રીએક્ટની કાસ્કેડિંગ રેન્ડર એરર કાયમ માટે દૂર થઈ જશે
       setTimeout(() => {
         setIsAuthorized(true);
+        fetchDashboardStats();
       }, 0);
     }
   }, [router]);
+
+  // Supabase માંથી લાઈવ પ્રોપર્ટી કાઉન્ટ લાવવા માટેનું ફંકશન
+  const fetchDashboardStats = async () => {
+    try {
+      const { count, error } = await supabase
+        .from("properties")
+        .select("*", { count: "exact", head: true });
+
+      if (!error && count !== null) {
+        setActivePropertiesCount(count);
+      }
+    } catch (err) {
+      console.error("Error fetching stats:", err);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   if (!isAuthorized) {
     return (
@@ -55,7 +75,7 @@ export default function DashboardPage() {
             વેબસાઇટ ટ્રાફિક, લીડ્સ અને પ્રોપર્ટીનું લાઇવ સ્ટેટિસ્ટિક્સ
           </p>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <Link
             href="/admin/properties/add"
@@ -63,7 +83,7 @@ export default function DashboardPage() {
           >
             + Add Property
           </Link>
-          
+
           <button
             onClick={handleLogout}
             className="bg-rose-600 hover:bg-rose-500 text-white font-extrabold px-5 py-3 rounded-xl transition shadow-md text-sm cursor-pointer"
@@ -76,37 +96,50 @@ export default function DashboardPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">🌐 Total Visitors (Traffic)</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+            🌐 Total Visitors (Traffic)
+          </p>
           <p className="text-3xl font-black text-blue-600 mt-2">1,245</p>
-          <span className="text-xs font-bold text-emerald-600 mt-1 inline-block">Today: +184</span>
+          <span className="text-xs font-bold text-emerald-600 mt-1 inline-block">
+            Today: +184
+          </span>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">📩 Total Leads Received</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+            📩 Total Leads Received
+          </p>
           <p className="text-3xl font-black text-amber-500 mt-2">2</p>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">🏢 Active Properties</p>
-          <p className="text-3xl font-black text-emerald-600 mt-2">1</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+            🏢 Active Properties
+          </p>
+          <p className="text-3xl font-black text-emerald-600 mt-2">
+            {loadingStats ? "..." : activePropertiesCount}
+          </p>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">📍 Top Location</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+            📍 Top Location
+          </p>
           <p className="text-2xl font-black text-purple-600 mt-2">Ahmedabad</p>
         </div>
       </div>
 
-      {/* 📊 NEW REAL-TIME ANALYTICS GRAPH / VISUALIZER */}
+      {/* 📊 REAL-TIME ANALYTICS GRAPH */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-base font-bold text-slate-800">📈 Weekly Traffic & Lead Generation Trend</h2>
+          <h2 className="text-base font-bold text-slate-800">
+            📈 Weekly Traffic & Lead Generation Trend
+          </h2>
           <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
             🟢 Live Sync Active
           </span>
         </div>
-        
-        {/* Custom Pure CSS Bar Graph */}
+
         <div className="grid grid-cols-7 gap-4 items-end h-48 pt-6 border-b border-slate-100 pb-4">
           {[
             { day: "Mon", visitors: 120, leads: 1 },
@@ -119,8 +152,7 @@ export default function DashboardPage() {
           ].map((item, index) => (
             <div key={index} className="flex flex-col items-center gap-2 h-full justify-end">
               <div className="w-full flex items-end justify-center gap-1.5 h-36">
-                {/* Visitors Bar */}
-                <div 
+                <div
                   className="w-3 bg-blue-600 rounded-t-md transition-all duration-500 hover:bg-blue-500 relative group"
                   style={{ height: `${(item.visitors / 350) * 100}%` }}
                 >
@@ -128,8 +160,7 @@ export default function DashboardPage() {
                     {item.visitors} Vis
                   </span>
                 </div>
-                {/* Leads Bar */}
-                <div 
+                <div
                   className="w-3 bg-amber-500 rounded-t-md transition-all duration-500 hover:bg-amber-400 relative group"
                   style={{ height: `${(item.leads / 10) * 100}%` }}
                 >
@@ -155,9 +186,10 @@ export default function DashboardPage() {
 
       {/* Analytics Rows */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Traffic Source */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h2 className="text-base font-bold text-slate-800 mb-4">🌐 Traffic Source (ક્યાંથી લોકો આવ્યા?)</h2>
+          <h2 className="text-base font-bold text-slate-800 mb-4">
+            🌐 Traffic Source (ક્યાંથી લોકો આવ્યા?)
+          </h2>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
@@ -191,21 +223,28 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Top Visitors by City */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h2 className="text-base font-bold text-slate-800 mb-4">📍 Top Visitors by City (કયા સિટીમાંથી?)</h2>
+          <h2 className="text-base font-bold text-slate-800 mb-4">
+            📍 Top Visitors by City (કયા સિટીમાંથી?)
+          </h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
               <span className="font-bold text-slate-800 text-sm">📍 Ahmedabad</span>
-              <span className="text-xs font-extrabold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">820 Visitors</span>
+              <span className="text-xs font-extrabold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                820 Visitors
+              </span>
             </div>
             <div className="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
               <span className="font-bold text-slate-800 text-sm">📍 Surat</span>
-              <span className="text-xs font-extrabold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">210 Visitors</span>
+              <span className="text-xs font-extrabold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                210 Visitors
+              </span>
             </div>
             <div className="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
               <span className="font-bold text-slate-800 text-sm">📍 Vadodara</span>
-              <span className="text-xs font-extrabold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">115 Visitors</span>
+              <span className="text-xs font-extrabold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                115 Visitors
+              </span>
             </div>
           </div>
         </div>
