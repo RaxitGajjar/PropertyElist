@@ -4,6 +4,23 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+interface ProjectItem {
+  id: number | string;
+  slug?: string;
+  title?: string;
+  city?: string;
+  location?: string;
+  property_type?: string;
+  developer?: string;
+  category?: string;
+  details?: string;
+  images?: string;
+}
+
+interface LocationItem {
+  display_name: string;
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("BUY");
@@ -14,14 +31,12 @@ export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   
-  // Profile & Notification Dropdown States
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const notifDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState({
     name: "Aniket Builder",
@@ -30,12 +45,16 @@ export default function HomePage() {
   });
 
   useEffect(() => {
-    const authStatus = localStorage.getItem("property_is_logged_in");
+    const authStatus = sessionStorage.getItem("property_is_logged_in");
     if (authStatus === "true") {
       setIsLoggedIn(true);
-      const savedUser = localStorage.getItem("property_user_data");
+      const savedUser = sessionStorage.getItem("user") || sessionStorage.getItem("property_user_data");
       if (savedUser) {
-        setUserData(JSON.parse(savedUser));
+        try {
+          setUserData(JSON.parse(savedUser));
+        } catch {
+          // ignore parse error
+        }
       }
     } else {
       setIsLoggedIn(false);
@@ -59,11 +78,10 @@ export default function HomePage() {
     }
   ]);
 
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Original Sample Data
-  const fallbackProjects = [
+  const fallbackProjects: ProjectItem[] = [
     {
       id: 1,
       slug: "aniket-elite-ahmedabad",
@@ -103,28 +121,38 @@ export default function HomePage() {
   ];
 
   useEffect(() => {
+    let isSubscribed = true;
     const fetchMySQLProjects = async () => {
       setLoading(true);
       try {
         const response = await fetch(`/api/projects?city=${encodeURIComponent(selectedCity)}`);
         const data = await response.json();
         
-        if (Array.isArray(data) && data.length > 0) {
-          setProjects(data);
-        } else {
-          const filteredFallback = fallbackProjects.filter(
-            (p) => p.city.toLowerCase() === selectedCity.toLowerCase()
-          );
-          setProjects(filteredFallback.length > 0 ? filteredFallback : fallbackProjects);
+        if (isSubscribed) {
+          if (Array.isArray(data) && data.length > 0) {
+            setProjects(data);
+          } else {
+            const filteredFallback = fallbackProjects.filter(
+              (p) => p.city?.toLowerCase() === selectedCity.toLowerCase()
+            );
+            setProjects(filteredFallback.length > 0 ? filteredFallback : fallbackProjects);
+          }
         }
-      } catch (err) {
-        setProjects(fallbackProjects);
+      } catch {
+        if (isSubscribed) {
+          setProjects(fallbackProjects);
+        }
       } finally {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
     fetchMySQLProjects();
+    return () => {
+      isSubscribed = false;
+    };
   }, [selectedCity]);
 
   const filteredProjects = projects.filter((project) => {
@@ -140,6 +168,7 @@ export default function HomePage() {
   const ownerPropertiesList = filteredProjects.filter(p => p.category === "Owner Properties" || p.developer?.includes("Owner") || (!p.developer?.includes("Builder") && !p.developer?.includes("Broker") && !p.developer?.includes("Realty")));
 
   useEffect(() => {
+    let isSubscribed = true;
     const fetchLocations = async () => {
       if (searchQuery.trim().length < 2) {
         setSuggestions([]);
@@ -153,17 +182,22 @@ export default function HomePage() {
           )}&addressdetails=1&limit=10`,
           { headers: { "Accept-Language": "en" } }
         );
-        const data = await response.json();
-        const places = data.map((item: any) => item.display_name);
-        setSuggestions(places);
-        setIsOpen(true);
+        const data: LocationItem[] = await response.json();
+        if (isSubscribed) {
+          const places = data.map((item) => item.display_name);
+          setSuggestions(places);
+          setIsOpen(true);
+        }
       } catch (error) {
         console.error("Error fetching locations:", error);
       }
     };
 
     const debounceTimer = setTimeout(fetchLocations, 300);
-    return () => clearTimeout(debounceTimer);
+    return () => {
+      isSubscribed = false;
+      clearTimeout(debounceTimer);
+    };
   }, [searchQuery, selectedCity]);
 
   useEffect(() => {
@@ -204,8 +238,7 @@ export default function HomePage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("property_is_logged_in");
-    localStorage.removeItem("property_user_data");
+    sessionStorage.clear();
     setIsLoggedIn(false);
     setShowProfileDropdown(false);
     router.push("/");
@@ -229,7 +262,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 relative">
       
-      {/* CSS KEYFRAMES FOR SMOOTH FAST ANIMATIONS & SCROLL EFFECTS */}
       <style jsx global>{`
         @keyframes pageFadeIn {
           from { opacity: 0; transform: translateY(6px); }
@@ -384,7 +416,6 @@ export default function HomePage() {
               </>
             )}
 
-            {/* POST PROPERTY BUTTON */}
             <button 
               onClick={handlePostPropertyClick}
               className="relative bg-[#10b981] hover:bg-[#059669] text-white font-bold text-xs uppercase tracking-widest px-5 py-3 transition shadow-md inline-flex items-center ml-2 cursor-pointer"
@@ -566,7 +597,6 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              {/* ENQUIRE NOW BUTTON WITH LOGO MATCHING GREEN COLOR */}
               <Link 
                 href="/projects/aniket-elite-ahmedabad" 
                 className="bg-[#10b981] hover:bg-[#059669] text-white font-bold text-xs uppercase tracking-widest px-8 py-4 text-center transition rounded-lg shadow-xl hover:scale-105 cursor-pointer whitespace-nowrap"

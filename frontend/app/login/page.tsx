@@ -18,14 +18,22 @@ export default function UserLoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // 💡 sessionStorage સેટ કર્યું છે જેથી ટેબ ક્લોઝ થતાં ઓટોમેટિક લોગઆઉટ થઈ જાય
+
+    // 🛑 જૂના LocalStorage ડેટા સાફ કરો
+    localStorage.removeItem("property_is_logged_in");
+    localStorage.removeItem("property_user_data");
+
+    // 🟢 sessionStorage નો ઉપયોગ (ટેબ ક્લોઝ થતાં જ લોગઆઉટ થશે)
     sessionStorage.setItem("property_is_logged_in", "true");
-    sessionStorage.setItem("user", JSON.stringify({
-      name: identifier.split("@")[0] || "User",
-      email: identifier || "user@propertyelist.com",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
-    }));
+    sessionStorage.setItem(
+      "user",
+      JSON.stringify({
+        name: identifier.split("@")[0] || "User",
+        email: identifier || "user@propertyelist.com",
+        avatar:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+      })
+    );
 
     alert("Login successful!");
     router.push("/");
