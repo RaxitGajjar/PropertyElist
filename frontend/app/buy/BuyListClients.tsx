@@ -5,15 +5,16 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 interface Property {
-  id: number;
-  slug: string;
-  title: string;
-  price: string;
-  city: string;
-  location: string;
-  property_type: string;
-  developer: string;
+  id: number | string;
+  slug?: string;
+  title?: string;
+  price?: string;
+  city?: string;
+  location?: string;
+  property_type?: string;
+  developer?: string;
   isFeatured?: boolean;
+  offer?: string;
   details?: string;
   images?: string;
 }
@@ -41,6 +42,7 @@ export default function BuyListClients() {
       property_type: "Apartment / Penthouse",
       developer: "Aniket Group (Builder)",
       isFeatured: true,
+      offer: "🎁 10 Gram Gold Coin Free • 0% Stamp Duty",
       details: "42 Limited Homes and 6 Commercial Shops",
       images: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=300&q=80",
     },
@@ -197,6 +199,11 @@ export default function BuyListClients() {
                       <p className="text-slate-500 text-xs tracking-wide flex items-center gap-1 mt-0.5">
                         📍 {item.location}
                       </p>
+                      {item.offer && (
+                        <div className="mt-1.5 inline-block bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded uppercase">
+                          ⚡ {item.offer}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -248,6 +255,11 @@ export default function BuyListClients() {
                       <p className="text-slate-500 text-xs tracking-wide flex items-center gap-1 mt-0.5">
                         📍 {item.location}
                       </p>
+                      {item.offer && (
+                        <div className="mt-1.5 inline-block bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded uppercase">
+                          ⚡ {item.offer}
+                        </div>
+                      )}
                     </div>
                   </div>
 

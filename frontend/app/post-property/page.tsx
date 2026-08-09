@@ -57,6 +57,18 @@ const propertyOptionsList = [
   "Agricultural Land"
 ];
 
+// Special Offers Suggestions List
+const offerSuggestionsList = [
+  "🎁 10 Gram Gold Coin Free",
+  "🛋️ Free Modular Kitchen & Furniture",
+  "⚡ 0% Stamp Duty & Registration Charge",
+  "🚫 0% GST Scheme",
+  "🚘 Free Car Parking Allotment",
+  "💰 Spot Booking Discount Available",
+  "❄️ AC Free In All Bedrooms",
+  "🤝 0% Brokerage Charge"
+];
+
 // Admin Amenities Categories Grouped Exact Match
 const amenitiesCategories = {
   Leisure: [
@@ -101,9 +113,11 @@ export default function CustomerPostPropertyPage() {
   const [powerHp, setPowerHp] = useState("");
   const [floorNo, setFloorNo] = useState("");
 
-  // Parking & Amenities States
+  // Parking, Amenities & Offers States
   const [parking, setParking] = useState("1");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedOffers, setSelectedOffers] = useState<string[]>([]);
+  const [customOfferInput, setCustomOfferInput] = useState("");
 
   // Pricing & Location
   const [price, setPrice] = useState("");
@@ -143,6 +157,21 @@ export default function CustomerPostPropertyPage() {
       setSelectedAmenities(selectedAmenities.filter(item => item !== amenity));
     } else {
       setSelectedAmenities([...selectedAmenities, amenity]);
+    }
+  };
+
+  const handleOfferToggle = (offer: string) => {
+    if (selectedOffers.includes(offer)) {
+      setSelectedOffers(selectedOffers.filter(item => item !== offer));
+    } else {
+      setSelectedOffers([...selectedOffers, offer]);
+    }
+  };
+
+  const handleAddCustomOffer = () => {
+    if (customOfferInput.trim() && !selectedOffers.includes(customOfferInput.trim())) {
+      setSelectedOffers([...selectedOffers, customOfferInput.trim()]);
+      setCustomOfferInput("");
     }
   };
 
@@ -192,13 +221,14 @@ export default function CustomerPostPropertyPage() {
           location: `${schemeName ? schemeName + ", " : ""}${locationInput}`,
           property_type: propertyType,
           developer: developerName || "Owner Listing",
+          offer: selectedOffers.join(" • "),
           details: `${isResidentialBhk ? bhk + " • " : ""}${areaDetailsStr} • Parking: ${parking} • Amenities: ${selectedAmenities.join(", ")} • Price: ₹${Number(price).toLocaleString('en-IN')}`,
         }),
       });
 
       alert("🎉 તમારી પ્રોપર્ટી સફળતાપૂર્વક લિસ્ટ થઈ ગઈ છે!");
       window.location.href = "/";
-    } catch (error) {
+    } catch {
       alert("🎉 તમારી પ્રોપર્ટી સફળતાપૂર્વક લિસ્ટ થઈ ગઈ છે!");
       window.location.href = "/";
     } finally {
@@ -227,6 +257,7 @@ export default function CustomerPostPropertyPage() {
       setGalleryImages([]);
       setBrochurePdf(null);
       setSelectedAmenities([]);
+      setSelectedOffers([]);
     }
   };
 
@@ -617,6 +648,54 @@ export default function CustomerPostPropertyPage() {
                 </>
               )}
 
+            </div>
+          </div>
+
+          {/* 🎁 SPECIAL OFFERS & DEALS SECTION */}
+          <div className="bg-amber-50/60 border border-amber-200 rounded-xl p-8 shadow-sm">
+            <h2 className="text-sm font-black uppercase tracking-widest text-amber-900 border-b border-amber-200 pb-4 mb-3 flex items-center gap-2">
+              🎁 Special Offers & Schemes (Attractive Buyer Deals)
+            </h2>
+            <p className="text-xs text-amber-700 mb-6">
+              Select or type special promotional offers provided for this property to highlight on search results & listing cards.
+            </p>
+
+            <div className="flex flex-wrap gap-2.5 mb-6">
+              {offerSuggestionsList.map((offer, idx) => {
+                const isSelected = selectedOffers.includes(offer);
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleOfferToggle(offer)}
+                    className={`py-2 px-3.5 text-xs font-bold rounded-lg border transition cursor-pointer flex items-center gap-2 ${
+                      isSelected
+                        ? "bg-amber-500 text-slate-950 border-amber-600 shadow-md scale-105"
+                        : "bg-white text-slate-700 border-amber-300 hover:bg-amber-100"
+                    }`}
+                  >
+                    <span>{offer}</span>
+                    {isSelected && <span className="font-extrabold text-slate-950">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={customOfferInput}
+                onChange={(e) => setCustomOfferInput(e.target.value)}
+                placeholder="Type custom offer (e.g. Free iPhone on Spot Booking)..."
+                className="w-full bg-white border border-amber-300 rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-amber-600 transition"
+              />
+              <button
+                type="button"
+                onClick={handleAddCustomOffer}
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase px-5 py-2.5 rounded-lg transition shrink-0 cursor-pointer"
+              >
+                + Add Offer
+              </button>
             </div>
           </div>
 

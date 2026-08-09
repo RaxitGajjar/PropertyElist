@@ -15,6 +15,7 @@ interface ProjectItem {
   category?: string;
   details?: string;
   images?: string;
+  offers?: string[];
 }
 
 interface LocationItem {
@@ -95,6 +96,7 @@ export default function HomePage() {
       category: "New Projects",
       details: "42 Limited Homes and 6 Commercial Shops",
       images: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
+      offers: ["🎁 10g Gold Coin", "🛋️ Free Modular Kitchen", "⚡ 0% Brokerage"],
     },
     {
       id: 2,
@@ -107,6 +109,7 @@ export default function HomePage() {
       category: "Agent / Broker Properties",
       details: "Grade A Commercial Office Spaces",
       images: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      offers: ["🏢 Free AC Fitting", "💸 1 Year Maintenance Free"],
     },
     {
       id: 3,
@@ -119,6 +122,7 @@ export default function HomePage() {
       category: "Owner Properties",
       details: "Luxury 4 BHK Bungalows Gated Community",
       images: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
+      offers: ["🚗 Free Car Parking", "⚡ Direct Owner (0% Brokerage)"],
     },
   ];
 
@@ -578,7 +582,7 @@ export default function HomePage() {
           <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="max-w-2xl">
               <span className="bg-amber-500 text-slate-950 text-[10px] font-black px-3 py-1 uppercase tracking-widest rounded-full shadow">
-                ⚡ SPONSORED ADVERTISEMENT
+                ⚡ SPONSORED ADVERTISEMENT & LIMITED OFFERS
               </span>
 
               <h2 className="text-2xl md:text-4xl font-light text-white tracking-wide uppercase mt-4">
@@ -586,8 +590,21 @@ export default function HomePage() {
               </h2>
 
               <p className="text-slate-300 text-xs md:text-sm mt-2 leading-relaxed">
-                4 BHK Premium Apartments & Exclusive Commercial Spaces at Science City Circle, Ahmedabad. Book your dream home with 0% Brokerage.
+                4 BHK Premium Apartments & Exclusive Commercial Spaces at Science City Circle, Ahmedabad. Book your dream home with special booking benefits!
               </p>
+
+              {/* Special Offer Highlights in Banner */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold px-3 py-1 rounded-full uppercase">
+                  🎁 Guaranteed 10g Gold Coin
+                </span>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold px-3 py-1 rounded-full uppercase">
+                  🛋️ Free Modular Kitchen
+                </span>
+                <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold px-3 py-1 rounded-full uppercase">
+                  ⚡ 0% Brokerage Direct
+                </span>
+              </div>
 
               <div className="flex gap-4 mt-4 text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
                 <span>✓ Ready Possession</span>
@@ -634,28 +651,46 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {filteredProjects.map((scheme) => (
-              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden">
-                <div className="h-60 bg-slate-100 relative overflow-hidden">
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
-                    style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80"}')` }}
-                  ></div>
+              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="h-60 bg-slate-100 relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
+                      style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80"}')` }}
+                    ></div>
+                    {scheme.offers && scheme.offers.length > 0 && (
+                      <span className="absolute top-3 left-3 bg-amber-500 text-slate-950 font-black text-[9px] px-2.5 py-1 uppercase rounded-full shadow-lg">
+                        🔥 Special Offer
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
+                    {scheme.developer && (
+                      <p className="text-emerald-700 text-[11px] font-bold mt-2">
+                        Listed by: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
+                      </p>
+                    )}
+
+                    {/* Offers Badges on Property Cards */}
+                    {scheme.offers && scheme.offers.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1">
+                        {scheme.offers.map((offer, idx) => (
+                          <span key={idx} className="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold px-2 py-0.5 rounded">
+                            {offer}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="p-6">
-                  <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
-                  <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
-                  {scheme.developer && (
-                    <p className="text-emerald-700 text-[11px] font-bold mt-2">
-                      Listed by: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
-                    </p>
-                  )}
-
-                  <div className="mt-5">
-                    <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
-                      View Project Details
-                    </Link>
-                  </div>
+                <div className="p-6 pt-0">
+                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                    View Project Details
+                  </Link>
                 </div>
               </div>
             ))}
@@ -683,28 +718,46 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {newProjectsList.map((scheme) => (
-              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden">
-                <div className="h-60 bg-slate-100 relative overflow-hidden">
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
-                    style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80"}')` }}
-                  ></div>
+              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="h-60 bg-slate-100 relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
+                      style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80"}')` }}
+                    ></div>
+                    {scheme.offers && scheme.offers.length > 0 && (
+                      <span className="absolute top-3 left-3 bg-amber-500 text-slate-950 font-black text-[9px] px-2.5 py-1 uppercase rounded-full shadow-lg">
+                        🔥 Special Offer
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
+                    {scheme.developer && (
+                      <p className="text-emerald-700 text-[11px] font-bold mt-2">
+                        Builder: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
+                      </p>
+                    )}
+
+                    {/* Offers Badges */}
+                    {scheme.offers && scheme.offers.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1">
+                        {scheme.offers.map((offer, idx) => (
+                          <span key={idx} className="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold px-2 py-0.5 rounded">
+                            {offer}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="p-6">
-                  <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
-                  <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
-                  {scheme.developer && (
-                    <p className="text-emerald-700 text-[11px] font-bold mt-2">
-                      Builder: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
-                    </p>
-                  )}
-
-                  <div className="mt-5">
-                    <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
-                      View Details
-                    </Link>
-                  </div>
+                <div className="p-6 pt-0">
+                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                    View Details
+                  </Link>
                 </div>
               </div>
             ))}
@@ -732,28 +785,41 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {agentPropertiesList.map((scheme) => (
-              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden">
-                <div className="h-60 bg-slate-100 relative overflow-hidden">
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
-                    style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"}')` }}
-                  ></div>
+              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="h-60 bg-slate-100 relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
+                      style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80"}')` }}
+                    ></div>
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
+                    {scheme.developer && (
+                      <p className="text-blue-700 text-[11px] font-bold mt-2">
+                        Agent: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
+                      </p>
+                    )}
+
+                    {/* Offers Badges */}
+                    {scheme.offers && scheme.offers.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1">
+                        {scheme.offers.map((offer, idx) => (
+                          <span key={idx} className="bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded">
+                            {offer}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="p-6">
-                  <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
-                  <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
-                  {scheme.developer && (
-                    <p className="text-blue-700 text-[11px] font-bold mt-2">
-                      Agent: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
-                    </p>
-                  )}
-
-                  <div className="mt-5">
-                    <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
-                      View Details
-                    </Link>
-                  </div>
+                <div className="p-6 pt-0">
+                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                    View Details
+                  </Link>
                 </div>
               </div>
             ))}
@@ -781,28 +847,41 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {ownerPropertiesList.map((scheme) => (
-              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden">
-                <div className="h-60 bg-slate-100 relative overflow-hidden">
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
-                    style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"}')` }}
-                  ></div>
+              <div key={scheme.id} className="border border-slate-200 bg-white group shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 rounded-xl overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="h-60 bg-slate-100 relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition duration-500"
+                      style={{ backgroundImage: `url('${scheme.images || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"}')` }}
+                    ></div>
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
+                    {scheme.developer && (
+                      <p className="text-amber-700 text-[11px] font-bold mt-2">
+                        Owner: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
+                      </p>
+                    )}
+
+                    {/* Offers Badges */}
+                    {scheme.offers && scheme.offers.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1">
+                        {scheme.offers.map((offer, idx) => (
+                          <span key={idx} className="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold px-2 py-0.5 rounded">
+                            {offer}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="p-6">
-                  <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
-                  <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
-                  {scheme.developer && (
-                    <p className="text-amber-700 text-[11px] font-bold mt-2">
-                      Owner: <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 uppercase">{scheme.developer}</span>
-                    </p>
-                  )}
-
-                  <div className="mt-5">
-                    <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
-                      View Details
-                    </Link>
-                  </div>
+                <div className="p-6 pt-0">
+                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                    View Details
+                  </Link>
                 </div>
               </div>
             ))}
@@ -822,7 +901,7 @@ export default function HomePage() {
           <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="max-w-2xl">
               <span className="bg-amber-500 text-slate-950 text-[10px] font-black px-3 py-1 uppercase tracking-widest rounded-full shadow">
-                ⚡ SPONSORED ADVERTISEMENT
+                ⚡ SPONSORED ADVERTISEMENT & LIMITED OFFERS
               </span>
 
               <h2 className="text-2xl md:text-4xl font-light text-white tracking-wide uppercase mt-4">
@@ -830,8 +909,20 @@ export default function HomePage() {
               </h2>
 
               <p className="text-slate-300 text-xs md:text-sm mt-2 leading-relaxed">
-                4 BHK Premium Apartments & Exclusive Commercial Spaces at Science City Circle, Ahmedabad. Book your dream home with 0% Brokerage.
+                4 BHK Premium Apartments & Exclusive Commercial Spaces at Science City Circle, Ahmedabad. Book your dream home with special booking benefits!
               </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold px-3 py-1 rounded-full uppercase">
+                  🎁 Guaranteed 10g Gold Coin
+                </span>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold px-3 py-1 rounded-full uppercase">
+                  🛋️ Free Modular Kitchen
+                </span>
+                <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold px-3 py-1 rounded-full uppercase">
+                  ⚡ 0% Brokerage Direct
+                </span>
+              </div>
 
               <div className="flex gap-4 mt-4 text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
                 <span>✓ Ready Possession</span>
