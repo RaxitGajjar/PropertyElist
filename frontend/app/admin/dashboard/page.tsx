@@ -9,6 +9,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [activePropertiesCount, setActivePropertiesCount] = useState<number>(0);
+  const [totalLeadsCount, setTotalLeadsCount] = useState<number>(0);
+  const [totalVisitorsCount, setTotalVisitorsCount] = useState<number>(0);
   const [loadingStats, setLoadingStats] = useState<boolean>(true);
 
   useEffect(() => {
@@ -31,18 +33,35 @@ export default function DashboardPage() {
     }
   }, [router]);
 
-  // Supabase માંથી લાઈવ પ્રોપર્ટી કાઉન્ટ લાવવા માટેનું ફંકશન
+  // Supabase માંથી લાઇવ સ્ટેટિસ્ટિક્સ લાવવા માટેનું અપડેટેડ ફંકશન
   const fetchDashboardStats = async () => {
     try {
-      const { count, error } = await supabase
+      setLoadingStats(true);
+
+      // ૧. Active (Approved) Properties Count
+      const { count: propCount } = await supabase
         .from("properties")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "approved");
+
+      if (propCount !== null) setActivePropertiesCount(propCount);
+
+      // ૨. Total Leads Count (from user_profiles)
+      const { count: leadCount } = await supabase
+        .from("user_profiles")
         .select("*", { count: "exact", head: true });
 
-      if (!error && count !== null) {
-        setActivePropertiesCount(count);
-      }
+      if (leadCount !== null) setTotalLeadsCount(leadCount);
+
+      // ૩. Total Visitors Count (from activity_logs)
+      const { count: visitorCount } = await supabase
+        .from("activity_logs")
+        .select("*", { count: "exact", head: true });
+
+      if (visitorCount !== null) setTotalVisitorsCount(visitorCount);
+
     } catch (err) {
-      console.error("Error fetching stats:", err);
+      console.error("Error fetching live dashboard stats:", err);
     } finally {
       setLoadingStats(false);
     }
@@ -99,9 +118,11 @@ export default function DashboardPage() {
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
             🌐 Total Visitors (Traffic)
           </p>
-          <p className="text-3xl font-black text-blue-600 mt-2">1,245</p>
+          <p className="text-3xl font-black text-blue-600 mt-2">
+            {loadingStats ? "..." : totalVisitorsCount}
+          </p>
           <span className="text-xs font-bold text-emerald-600 mt-1 inline-block">
-            Today: +184
+            Live Sync Active
           </span>
         </div>
 
@@ -109,7 +130,9 @@ export default function DashboardPage() {
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
             📩 Total Leads Received
           </p>
-          <p className="text-3xl font-black text-amber-500 mt-2">2</p>
+          <p className="text-3xl font-black text-amber-500 mt-2">
+            {loadingStats ? "..." : totalLeadsCount}
+          </p>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">

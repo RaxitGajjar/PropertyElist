@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 interface ProjectItem {
   id: number | string;
@@ -131,25 +132,36 @@ export default function HomePage() {
     },
   ];
 
+  // Supabase માંથી Approved પ્રોપર્ટીઝ લાઇવ ફેચ કરવા માટેનું ફંક્શન
   useEffect(() => {
     let isSubscribed = true;
-    const fetchMySQLProjects = async () => {
+
+    const fetchLiveProperties = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/projects?city=${encodeURIComponent(selectedCity)}`);
-        const data = await response.json();
-        
+        // ૧. Supabase માંથી ફક્ત status: 'approved' અને પસંદ કરેલા સિટીના ડેટા લાવશે
+        const { data, error } = await supabase
+          .from("properties")
+          .select("*")
+          .eq("status", "approved");
+
         if (isSubscribed) {
-          if (Array.isArray(data) && data.length > 0) {
-            setProjects(data);
+          if (!error && Array.isArray(data) && data.length > 0) {
+            // જો સિટી મેચ થતી હોય તે ડેટા ફિલ્ટર કરવો
+            const cityFiltered = data.filter(
+              (p) => !p.city || p.city.toLowerCase() === selectedCity.toLowerCase()
+            );
+            setProjects(cityFiltered.length > 0 ? cityFiltered : data);
           } else {
+            // જો Supabase માં ડેટા ન હોય તો Fallback બતાવશે
             const filteredFallback = fallbackProjects.filter(
               (p) => p.city?.toLowerCase() === selectedCity.toLowerCase()
             );
             setProjects(filteredFallback.length > 0 ? filteredFallback : fallbackProjects);
           }
         }
-      } catch {
+      } catch (err) {
+        console.error("Error fetching live properties from Supabase:", err);
         if (isSubscribed) {
           setProjects(fallbackProjects);
         }
@@ -160,7 +172,8 @@ export default function HomePage() {
       }
     };
 
-    fetchMySQLProjects();
+    fetchLiveProperties();
+
     return () => {
       isSubscribed = false;
     };
@@ -701,7 +714,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="p-6 pt-0">
-                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                  <Link href={`/projects/${scheme.slug || scheme.id}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
                     View Project Details
                   </Link>
                 </div>
@@ -776,7 +789,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="p-6 pt-0">
-                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                  <Link href={`/projects/${scheme.slug || scheme.id}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
                     View Details
                   </Link>
                 </div>
@@ -846,7 +859,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="p-6 pt-0">
-                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                  <Link href={`/projects/${scheme.slug || scheme.id}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
                     View Details
                   </Link>
                 </div>
@@ -916,7 +929,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="p-6 pt-0">
-                  <Link href={`/projects/${scheme.slug}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
+                  <Link href={`/projects/${scheme.slug || scheme.id}`} className="block w-full text-center border border-slate-900 py-3 text-xs uppercase tracking-widest font-bold hover:bg-slate-900 hover:text-white transition rounded">
                     View Details
                   </Link>
                 </div>
