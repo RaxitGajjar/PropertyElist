@@ -8,6 +8,7 @@ interface ProjectItem {
   id: number | string;
   slug?: string;
   title?: string;
+  price?: string;
   city?: string;
   location?: string;
   property_type?: string;
@@ -39,30 +40,31 @@ export default function HomePage() {
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const notifDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Authentication State (sessionStorage)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState({
-    name: "Aniket Builder",
-    email: "aniket@propertyelist.com",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+  // Authentication State (sessionStorage) - Lazy Initialized
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("property_is_logged_in") === "true";
   });
 
-  useEffect(() => {
-    const authStatus = sessionStorage.getItem("property_is_logged_in");
-    if (authStatus === "true") {
-      setIsLoggedIn(true);
-      const savedUser = sessionStorage.getItem("user") || sessionStorage.getItem("property_user_data");
-      if (savedUser) {
-        try {
-          setUserData(JSON.parse(savedUser));
-        } catch {
-          // ignore error
-        }
+  const [userData, setUserData] = useState(() => {
+    const defaultUser = {
+      name: "Aniket Builder",
+      email: "aniket@propertyelist.com",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+    };
+
+    if (typeof window === "undefined") return defaultUser;
+
+    const savedUser = sessionStorage.getItem("user") || sessionStorage.getItem("property_user_data");
+    if (savedUser) {
+      try {
+        return JSON.parse(savedUser);
+      } catch {
+        // ignore error
       }
-    } else {
-      setIsLoggedIn(false);
     }
-  }, []);
+    return defaultUser;
+  });
 
   const [notifications, setNotifications] = useState([
     {
@@ -89,6 +91,7 @@ export default function HomePage() {
       id: 1,
       slug: "aniket-elite-ahmedabad",
       title: "Aniket Elite",
+      price: "₹1.25 Cr Onwards",
       city: "Ahmedabad",
       location: "Science City Circle",
       property_type: "Apartment / Penthouse",
@@ -102,6 +105,7 @@ export default function HomePage() {
       id: 2,
       slug: "skyline-avenue-ahmedabad",
       title: "Skyline Avenue",
+      price: "₹85 Lakhs Onwards",
       city: "Ahmedabad",
       location: "SG Highway",
       property_type: "Office Space",
@@ -115,6 +119,7 @@ export default function HomePage() {
       id: 3,
       slug: "royal-palms-gandhinagar",
       title: "Royal Palms Villa",
+      price: "₹2.10 Cr",
       city: "Gandhinagar",
       location: "Koba Circle",
       property_type: "Bungalow / Row House / Villa",
@@ -666,7 +671,15 @@ export default function HomePage() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                      {scheme.price && (
+                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-xs px-2.5 py-1 rounded uppercase whitespace-nowrap shadow-xs">
+                          {scheme.price}
+                        </span>
+                      )}
+                    </div>
+
                     <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
                     {scheme.developer && (
                       <p className="text-emerald-700 text-[11px] font-bold mt-2">
@@ -733,7 +746,15 @@ export default function HomePage() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                      {scheme.price && (
+                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-xs px-2.5 py-1 rounded uppercase whitespace-nowrap shadow-xs">
+                          {scheme.price}
+                        </span>
+                      )}
+                    </div>
+
                     <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
                     {scheme.developer && (
                       <p className="text-emerald-700 text-[11px] font-bold mt-2">
@@ -795,7 +816,15 @@ export default function HomePage() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                      {scheme.price && (
+                        <span className="bg-blue-50 text-blue-700 border border-blue-200 font-black text-xs px-2.5 py-1 rounded uppercase whitespace-nowrap shadow-xs">
+                          {scheme.price}
+                        </span>
+                      )}
+                    </div>
+
                     <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
                     {scheme.developer && (
                       <p className="text-blue-700 text-[11px] font-bold mt-2">
@@ -857,7 +886,15 @@ export default function HomePage() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <h3 className="text-lg font-bold uppercase tracking-wide text-slate-900">{scheme.title}</h3>
+                      {scheme.price && (
+                        <span className="bg-amber-50 text-amber-700 border border-amber-200 font-black text-xs px-2.5 py-1 rounded uppercase whitespace-nowrap shadow-xs">
+                          {scheme.price}
+                        </span>
+                      )}
+                    </div>
+
                     <p className="text-slate-500 text-xs mt-1 tracking-wide">{scheme.location} • {scheme.details}</p>
                     {scheme.developer && (
                       <p className="text-amber-700 text-[11px] font-bold mt-2">
