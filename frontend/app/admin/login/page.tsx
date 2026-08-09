@@ -12,12 +12,16 @@ export default function AdminLogin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // તમારો સેટ કરેલો યુઝરનેમ અને પાસવર્ડ
-    if (email === "raxit@1999" && password === "raxit@1234") {
-      // કુકીઝ અને લોકલ સ્ટોરેજ બંનેમાં સેવ કરી દઈએ જેથી ક્યાંય પ્રોબ્લેમ ન આવે
+    if (email === "me@123" && password === "raxit@1234") {
+      // 🔐 Middleware અને LocalStorage માટે Tokens સેટ કરીએ
+      document.cookie = "adminToken=authenticated; path=/; max-age=" + 60 * 60 * 24 * 7;
       document.cookie = "isAdminLoggedIn=true; path=/; max-age=" + 60 * 60 * 24 * 7;
+
+      localStorage.setItem("adminToken", "authenticated");
       localStorage.setItem("isAdminLoggedIn", "true");
+
       router.push("/admin/dashboard");
       router.refresh();
     } else {
@@ -28,7 +32,6 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 px-4 font-sans text-slate-900">
       <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border border-slate-800">
-        
         <div className="text-center mb-8">
           <span className="text-3xl font-black bg-emerald-600 text-white w-12 h-12 inline-flex items-center justify-center rounded-2xl shadow-lg mb-3">
             P
@@ -58,7 +61,7 @@ export default function AdminLogin() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-emerald-600 transition"
-              placeholder="raxit@1999"
+              placeholder="admin"
             />
           </div>
 
@@ -85,7 +88,10 @@ export default function AdminLogin() {
         </form>
 
         <div className="mt-8 text-center border-t border-slate-100 pt-6">
-          <Link href="/" className="text-xs font-bold text-slate-500 hover:text-emerald-600 transition uppercase tracking-widest">
+          <Link
+            href="/"
+            className="text-xs font-bold text-slate-500 hover:text-emerald-600 transition uppercase tracking-widest"
+          >
             ← Back to Main Website
           </Link>
         </div>

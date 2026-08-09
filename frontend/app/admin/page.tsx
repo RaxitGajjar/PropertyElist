@@ -1,9 +1,31 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function PackagesPage() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // 🔐 Auth Check Effect: લોગિન થયેલું છે કે નહીં તે પહેલા ચેક કરશે
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("adminToken");
+      const loggedIn = localStorage.getItem("isAdminLoggedIn");
+
+      if (!token && loggedIn !== "true") {
+        router.replace("/admin/login");
+      } else {
+        setIsAuthenticated(true);
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, [router]);
+
   // ૧. બિલ્ડર્સ, બ્રોકર્સ અને તેમની લાઈવ ચાલી રહેલી પ્રોપર્ટીઝનો ડેટા
   const activeSubscribers = [
     {
@@ -38,6 +60,18 @@ export default function PackagesPage() {
       ],
     },
   ];
+
+  // ⏳ જ્યાં સુધી Auth સ્ટેટસ ચેક થાય ત્યાં સુધી કશું જ ન બતાવો (લોડિંગ સ્પિનર)
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-900 text-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
+          <p className="text-sm font-semibold text-slate-300">Checking Authorization...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-100 font-sans text-slate-900">
